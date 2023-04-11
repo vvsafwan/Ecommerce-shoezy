@@ -1,0 +1,117 @@
+<%-include('../partials/userPartials/userHeader.ejs')%>
+
+    <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-9 ftco-animate text-center">
+          	<p class="breadcrumbs"><span class="mr-2"><a href="/home">Home</a></span> <span>Cart</span></p>
+            <h1 class="mb-0 bread">Cart</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="ftco-section ftco-cart">
+			<div class="container">
+				<div class="row">
+    			<div class="col-md-12 ftco-animate">
+    				<div class="cart-list">
+	    				<table class="table">
+						    <thead class="thead-primary">
+						      <tr class="text-center">
+						        <th>&nbsp;</th>
+						        <th>&nbsp;</th>
+						        <th>Product</th>
+						        <th>Price</th>
+						        <th>Quantity</th>
+						      </tr>
+						    </thead>
+						    <tbody>
+						   <%
+								products.forEach((product)=>{
+									%>
+									<tr class="text-center">
+										<td class="product-remove"><a href="/removeProduct?id=<%=product.productId._id%>"><span class="ion-ios-close"></span></a></td>
+										
+										<td class="image-prod"><div class="img" style="width: 200px;"><img src="productImages/<%=product.productId.image[0]%>" width="100%" alt=""></div></td>
+										
+										<td class="product-name">
+											<h3><%=product.productId.productName%></h3>
+											<p><%=product.productId.description%></p>
+										</td>
+										
+										<td class="price">₹<%=product.productId.price%></td>
+										
+										<td class="quantity">
+											<div class="input-group col-md-12 d-flex mb-3">
+												<span class="input-group-btn mr-2">
+												   <button type="button" class="quantity-left-minus btn" onclick="changeQuantity('<%=userId%>','<%=product.productId._id%>',-1)">-</button>
+												   </span>
+												<input type="text" id="quantity" name="count" class="quantity form-control input-number" value="<%=product.count%>" min="1" max="100">
+												<span class="input-group-btn ml-2">
+												   <button type="button" class="quantity-right-plus btn" onclick="changeQuantity('<%=userId%>','<%=product.productId._id%>',1)">+</button>
+												</span>
+											 </div>
+									  </td>
+									  </tr>
+									<%
+								})
+						   %>
+						    </tbody>
+						  </table>
+					  </div>
+    			</div>
+    		</div>
+    		<div class="row justify-content-start">
+    			<div class="col col-lg-5 col-md-6 mt-5 cart-wrap ftco-animate">
+    				<div class="cart-total mb-3">
+    					<h3>Cart Totals</h3>
+    					<p class="d-flex">
+    						<span>Subtotal</span>
+    						<span>₹<%=Total%></span>
+    					</p>
+    					<p class="d-flex">
+    						<span>Delivery</span>
+    						<span>₹0.00</span>
+    					</p>
+    					<hr>
+    					<p class="d-flex total-price">
+    						<span>Total</span>
+    						<span>₹<%=Total%></span>
+    					</p>
+    				</div>
+    				<p class="text-center"><a href="/checkout" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
+    			</div>
+    		</div>
+			</div>
+		</section>
+		
+	<script>
+		function changeQuantity(userId,proId,count){
+			$.ajax({
+				url:'/changeProductQuantity',
+				data:{
+					user:userId,
+					product:proId,
+					count:count
+				},
+				method:'post',
+				success:(response)=>{
+
+				}
+			}).done((data)=>{
+				if(data.success){
+					window.location.reload();
+				}else if(data.check){
+					Swal.fire({
+						icon: 'error',
+						title: 'Oops...',
+						text: 'Out Of Stock!'
+					})
+				}
+			})
+		}
+	</script>
+
+        <%-include('../partials/userPartials/userFooter.ejs')%>
+

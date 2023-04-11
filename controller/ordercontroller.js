@@ -9,6 +9,13 @@ const Coupon = require('../models/couponmodel');
 const dotenv = require('dotenv')
 dotenv.config();
 
+//htmltopdf require things
+const ejs = require('ejs');
+const pdf = require('html-pdf')
+const fs = require('fs')
+const path = require('path');
+
+
 var instance = new Razorpay({
     key_id: 'rzp_test_n0IW2eUop9hlZT',
     key_secret: process.env.RAZORKEY
@@ -245,6 +252,40 @@ const exportOrder = async (req,res)=>{
     }
 }
 
+const exportOrderPDF = async (req,res)=>{
+    try{
+        const orderData = await Order.find({});
+        const data = {
+            orderData:orderData
+        }
+        const filePathName = path.resolve(__dirname,'../views/admin/htmltopdf.ejs');
+        const htmlString = fs.readFileSync(filePathName).toString();
+        let option = {
+            format:'A3',
+            orientation:'portrait',
+            border:'10mm'
+        }
+        const ejsData = ejs.render(htmlString,data)
+        pdf.create(ejsData,option).toFile('order.pdf',(err,response)=>{
+            if(err) console.log(err);
+
+            const filePath = path.resolve(__dirname,'../order.pdf');
+            fs.readFile(filePath,(err,file)=>{
+                if(err){
+                    console.log(err);
+                    return res.status(500).send('Could not download the file')
+                }
+                res.setHeader('Content-Type','application/pdf')
+                res.setHeader('Content-Disposition','attachment;filename="order.pdf"')
+
+                res.status(file);
+            })
+        })
+    }catch(error){
+        console.log(error.message);
+    }
+}
+
 module.exports = {
     placeOrder,
     verifyPayment,
@@ -256,5 +297,6 @@ module.exports = {
     postEditOrder,
     viewProduct,
     cancelOrder,
-    exportOrder
+    exportOrder,
+    exportOrderPDF
 }

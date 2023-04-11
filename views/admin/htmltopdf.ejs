@@ -1,0 +1,66 @@
+<h2>Order List</h2>
+                <table class="w-full whitespace-no-wrap">
+                  <thead>
+                    <tr
+                      class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800"
+                    >
+                      <th class="px-5 py-3" style="padding-left: 60px;">OrderId</th>
+                      <th class="px-4 py-3">Date</th>
+                      <th class="px-4 py-3">Address</th>
+                      <th class="px-4 py-3">Amount</th>
+                      <th class="px-4 py-3">Payment</th>
+                      <th class="px-4 py-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800"
+                  >
+                  <tr>
+                    <%
+                    if(orderData.length>0){
+                      for(i=0;i<orderData.length;i++){
+                        %>
+                        <tr class="text-gray-700 dark:text-gray-400">
+                          <td class="px-4 py-3">
+                            <div class="flex items-center text-sm">
+                              <!-- Avatar with inset shadow -->
+                              <div
+                                class="relative hidden w-8 h-8 mr-3 rounded-full md:block"
+                              >
+                                <div
+                                  class="absolute inset-0 rounded-full shadow-inner"
+                                  aria-hidden="true"
+                                ></div>
+                              </div>
+                              <div>
+                                <p class="font-semibold"><%=orderData[orderData.length-i-1]._id%></p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">
+                                  User
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="px-4 py-3 text-sm"><%=orderData[orderData.length-i-1].date.toISOString().substring(0,10)%></td>
+                          <td class="px-4 py-3 text-xs">
+                            <span
+                              class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100"
+                            >
+                            <%=orderData[orderData.length-i-1].deliveryAddress%>
+                            </span>
+                          </td>
+                          <td class="px-4 py-3 text-sm"><p><%=orderData[orderData.length-i-1].totalAmount%></p></td>
+                          <td class="px-4 py-3 text-sm"><p><%=orderData[orderData.length-i-1].paymentMethod%></p></td>
+                          <td class="px-4 py-3 text-sm"><p><%=orderData[orderData.length-i-1].status%></p></td>
+                        </tr>
+                        <%
+                      }
+                    }else{
+                      %>
+                      <p style="color: white;padding: 30px;font-family: Georgia, 'Times New Roman', Times, serif;">Order not found</p>
+                      <%
+                    }
+                    %>
+                  </tr>
+
+                  </tbody>
+                </table>

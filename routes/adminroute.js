@@ -60,6 +60,7 @@ adminRoute.get('/UnlistCategory',auth.isLogin,categoryController.UnlistCategory)
 adminRoute.get('/unblockProduct',auth.isLogin,productController.unblockProduct);
 adminRoute.get('/blockProduct',auth.isLogin,productController.blockProduct);
 adminRoute.get('/exportOrder',auth.isLogin,orderController.exportOrder);
+adminRoute.get('/exportOrderPDF',auth.isLogin,orderController.exportOrderPDF);
 
 //--------------------------------------------------------------------------------------------------
 

@@ -1,4 +1,8 @@
 const User = require('../models/usermodel');
+const Order = require('../models/ordermodel');
+const Product = require('../models/productmodel');
+const moment = require('moment');
+moment().format()
 const bcrypt = require('bcrypt');
 
 const loadLogin = async (req,res)=>{
@@ -17,7 +21,41 @@ const loadDashboard = async (req,res)=>{
     try{
         if(req.session.admin_id){
             const userData = await User.find({is_admin:0});
-            res.render('dashboard',{users:userData});
+            const total = await Order.aggregate([{$group:{_id:null,total:{$sum:"$Amount"}}}])
+            const Users = await User.find({is_admin:0}).count();
+            const Orders = await Order.find({}).count();
+            const Products = await Product.find({}).count();
+            const Total = total[0].total;
+            const onlineCount = await Order.aggregate([{$group:{_id:"$paymentMethod",totalPayment:{$count:{}}}}])
+
+            console.log(onlineCount);
+
+            let sales = [];
+            var date = new Date();
+            var year = date.getFullYear();
+            var currentyear = new Date(year, 0, 1);
+            let salesByYear = await Order.aggregate([{$match:{createdAt:{$gte:currentyear},status:{$ne:"cancelled"}}},{$group:{
+                _id:{$dateToString:{format:"%m",date:"$createdAt"}},
+                total:{$sum:"$Amount"},  
+            }},{$sort:{_id:1}}]);
+            for(let i=1;i<=12;i++){
+                let result = true;
+                for(let k=0;k<salesByYear.length;k++){
+                    result = false;
+                    if(salesByYear[k]._id==i){
+                        sales.push(salesByYear[k])
+                        break;
+                    }else{
+                        result = true
+                    }
+                }
+                if(result) sales.push({_id:i,total:0});
+            }
+            let salesData = [];
+            for(let i=0;i<sales.length;i++){
+                salesData.push(sales[i].total);
+            }
+            res.render('dashboard',{users:userData,payment:onlineCount,Total,Users,Orders,Products,month:salesData});
         }else{
             res.redirect('/admin');
         }

@@ -46,6 +46,8 @@ const placeOrder = async (req,res)=>{
             orderWallet:wallet
         })
         const orderData = await order.save();
+        const date = orderData.date.toISOString().substring(5,7);
+        const orderId = orderData._id;
         if(orderData){
             for(let i=0;i<products.length;i++){
                 const pro = products[i].productId;
@@ -54,11 +56,13 @@ const placeOrder = async (req,res)=>{
             }
             if(order.status=="placed"){
                 const wal = totalPrice - Total;
+                await Order.updateOne({_id:orderId},{$set:{month:date}})
                 await User.updateOne({_id:req.session.user_id},{$inc:{wallet:-wal}});
                 await Cart.deleteOne({userName:req.session.user_id});
                 res.json({codSuccess:true});
             }else{
                 const orderId = orderData._id;
+                await Order.updateOne({_id:orderId},{$set:{month:date}})
                 const totalAmount = orderData.totalAmount;
                 var options = {
                     amount: totalAmount*100,
@@ -261,14 +265,11 @@ const exportOrderPDF = async (req,res)=>{
         const filePathName = path.resolve(__dirname,'../views/admin/htmltopdf.ejs');
         const htmlString = fs.readFileSync(filePathName).toString();
         let option = {
-            format:'A3',
-            orientation:'portrait',
-            border:'10mm'
+            format:'A3'
         }
         const ejsData = ejs.render(htmlString,data)
         pdf.create(ejsData,option).toFile('order.pdf',(err,response)=>{
             if(err) console.log(err);
-
             const filePath = path.resolve(__dirname,'../order.pdf');
             fs.readFile(filePath,(err,file)=>{
                 if(err){
@@ -276,9 +277,9 @@ const exportOrderPDF = async (req,res)=>{
                     return res.status(500).send('Could not download the file')
                 }
                 res.setHeader('Content-Type','application/pdf')
-                res.setHeader('Content-Disposition','attachment;filename="order.pdf"')
+                res.setHeader('Content-Disposition',`attachment;filename=order.pdf`)
 
-                res.status(file);
+                res.send(file);
             })
         })
     }catch(error){

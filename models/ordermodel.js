@@ -52,8 +52,10 @@ const orderSchema = new mongoose.Schema({
     },
     orderWallet:{
         type:Number
-    }
-})
+    },
+},
+{timestamps:true}
+)
 
 const ordermodel = mongoose.model("order",orderSchema);
 module.exports = ordermodel;

@@ -11,9 +11,6 @@ const dotenv = require('dotenv')
 dotenv.config();
 
 //htmltopdf require things
-const ejs = require('ejs');
-const pdf = require('html-pdf')
-const fs = require('fs')
 const path = require('path');
 
 

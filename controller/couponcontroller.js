@@ -23,9 +23,9 @@ const postAddCoupon = async(req,res)=>{
         })
         const couponData = await coupon.save();
         if(couponData){
-            res.render('addCoupon',{message:"Coupon Added Successfully"});
+            res.redirect('/listCoupon')
         }else{
-            res.render('addCoupon',{message:"Failed to add coupon"});
+            res.redirect('/listCoupon')
         }
     }catch(error){
         console.log(error.message);

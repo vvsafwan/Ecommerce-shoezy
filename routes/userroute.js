@@ -10,7 +10,7 @@ const couponController = require('../controller/couponcontroller');
 const wishlistController = require('../controller/wishlistcontroller')
 const path = require('path');
 const session = require('express-session');
-const secretConfig = require('../config/config');
+const secretConfig = require('../config/config.js');
 const auth = require('../middleware/auth');
 
 userRoute.use(session({

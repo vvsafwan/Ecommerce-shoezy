@@ -1,13 +1,13 @@
+const dotenv = require('dotenv')
+dotenv.config();
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/shoezy');
+mongoose.connect(process.env.MONGO);
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const userRoute = require('./routes/userroute');
 const adminRoute = require('./routes/adminroute');
-const dotenv = require('dotenv')
-dotenv.config();
 
 app.use((req, res, next) => {
     res.header(

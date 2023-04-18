@@ -28,8 +28,6 @@ const loadDashboard = async (req,res)=>{
             const Total = total[0].total;
             const onlineCount = await Order.aggregate([{$group:{_id:"$paymentMethod",totalPayment:{$count:{}}}}])
 
-            console.log(onlineCount);
-
             let sales = [];
             var date = new Date();
             var year = date.getFullYear();

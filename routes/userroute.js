@@ -1,3 +1,5 @@
+const dotenv = require('dotenv')
+dotenv.config();
 const express = require('express');
 const userRoute = express();
 const userController = require('../controller/usercontroller');
@@ -10,11 +12,10 @@ const couponController = require('../controller/couponcontroller');
 const wishlistController = require('../controller/wishlistcontroller')
 const path = require('path');
 const session = require('express-session');
-const secretConfig = require('../config/config.js');
 const auth = require('../middleware/auth');
 
 userRoute.use(session({
-    secret:secretConfig.sessionSecret,
+    secret:process.env.SESSION,
     saveUninitialized:true,
     resave:false
 }))

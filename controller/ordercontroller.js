@@ -6,6 +6,7 @@ const Product = require('../models/productmodel');
 const Razorpay = require('razorpay');
 const exceljs = require('exceljs');
 const Coupon = require('../models/couponmodel');
+const puppeteer = require('puppeteer');
 const dotenv = require('dotenv')
 dotenv.config();
 
@@ -256,32 +257,38 @@ const exportOrder = async (req,res)=>{
     }
 }
 
+const sales = async (req,res)=>{
+    try {
+        const orderData = await Order.find({});
+        res.render('htmltopdf',{orderData})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const exportOrderPDF = async (req,res)=>{
     try{
-        const orderData = await Order.find({});
-        const data = {
-            orderData:orderData
-        }
-        const filePathName = path.resolve(__dirname,'../views/admin/htmltopdf.ejs');
-        const htmlString = fs.readFileSync(filePathName).toString();
-        let option = {
-            format:'A3'
-        }
-        const ejsData = ejs.render(htmlString,data)
-        pdf.create(ejsData,option).toFile('order.pdf',(err,response)=>{
-            if(err) console.log(err);
-            const filePath = path.resolve(__dirname,'../order.pdf');
-            fs.readFile(filePath,(err,file)=>{
-                if(err){
-                    console.log(err);
-                    return res.status(500).send('Could not download the file')
-                }
-                res.setHeader('Content-Type','application/pdf')
-                res.setHeader('Content-Disposition',`attachment;filename=order.pdf`)
-
-                res.send(file);
-            })
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(`http://localhost:3000/admin/sales` , {
+        waitUntil:"networkidle2"
         })
+        await page.setViewport({width: 1680 , height: 1050})
+        const todayDate = new Date()
+        const pdfn = await page.pdf({
+            path: `${path.join(__dirname,'../public/files', todayDate.getTime()+".pdf")}`,
+            format: "A4"
+        })
+
+        await browser.close()
+    
+        const pdfUrl = path.join(__dirname,'../public/files', todayDate.getTime()+".pdf")
+
+        res.set({
+            "Content-Type":"application/pdf",
+            "Content-Length":pdfn.length
+        })
+        res.sendFile(pdfUrl)
     }catch(error){
         console.log(error.message);
     }
@@ -299,5 +306,6 @@ module.exports = {
     viewProduct,
     cancelOrder,
     exportOrder,
+    sales,
     exportOrderPDF
 }

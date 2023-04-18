@@ -25,7 +25,6 @@ const loadDashboard = async (req,res)=>{
             const Users = await User.find({is_admin:0}).count();
             const Orders = await Order.find({}).count();
             const Products = await Product.find({}).count();
-            const Total = total[0].total;
             const onlineCount = await Order.aggregate([{$group:{_id:"$paymentMethod",totalPayment:{$count:{}}}}])
 
             let sales = [];
@@ -53,7 +52,7 @@ const loadDashboard = async (req,res)=>{
             for(let i=0;i<sales.length;i++){
                 salesData.push(sales[i].total);
             }
-            res.render('dashboard',{users:userData,payment:onlineCount,Total,Users,Orders,Products,month:salesData});
+            res.render('dashboard',{users:userData,payment:onlineCount,total,Users,Orders,Products,month:salesData});
         }else{
             res.redirect('/admin');
         }
